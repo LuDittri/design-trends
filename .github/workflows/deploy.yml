@@ -1,0 +1,77 @@
+name: Update Trends & Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 12 * * *' # Runs daily at 12:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install Python Dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Fetch Latest Trends
+      env:
+        # We don't strictly need API keys for the public JSON endpoint, 
+        # but if we used them, they'd go here.
+        REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+        REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+        REDDIT_USER_AGENT: "script:design_trends_daily:v1.0 (by /u/github_action)"
+      run: |
+        python execution/check_design_trends.py
+        
+    - name: Commit Updated Data (Optional)
+      # Commits the JSON back to the repo so we have a history
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+        git add web-app/public/design_trends.json
+        # Only commit if there are changes
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update trends data" && git push)
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+        cache-dependency-path: web-app/package-lock.json
+
+    - name: Install Node Dependencies
+      working-directory: ./web-app
+      run: npm ci
+
+    - name: Build React App
+      working-directory: ./web-app
+      run: npm run build
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './web-app/dist'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

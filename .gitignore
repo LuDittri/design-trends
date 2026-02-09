@@ -1,0 +1,23 @@
+
+# Python
+.tmp/
+.env
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+web-app/node_modules/
+web-app/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+logs/
+*.log
