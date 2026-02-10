@@ -20,8 +20,28 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    # Python step removed to avoid Reddit IP blocks on GitHub Actions.
-    # User must run `python execution/check_design_trends.py` locally and commit the JSON.
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install Python Dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Fetch Latest Trends
+      run: |
+        python execution/check_design_trends.py
+        
+    - name: Commit Updated Data (Optional)
+      # Commits the JSON back to the repo so we have a history
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+        git add web-app/public/design_trends.json
+        # Only commit if there are changes
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update trends data" && git push)
 
     - name: Set up Node.js
       uses: actions/setup-node@v4

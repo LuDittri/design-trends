@@ -89,6 +89,11 @@ def fetch_design_trends():
             top_5 = topic_posts[:5]
             
             results[topic] = top_5
+            
+        # Validate that we actually got data
+        total_posts = sum(len(posts) for posts in results.values())
+        if total_posts == 0:
+            raise Exception("No data fetched from Reddit! Possible IP block or API issue.")
 
         # Save results to .tmp (internal use)
         os.makedirs(".tmp", exist_ok=True)
