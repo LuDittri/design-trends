@@ -39,8 +39,8 @@ def fetch_design_trends():
             for sub_name in subreddits:
                 logging.info(f"  Fetching top posts from r/{sub_name}...")
                 try:
-                    # Fetch 'hot' posts for fresher content
-                    url = f"https://www.reddit.com/r/{sub_name}/hot.json?limit=50"
+                    # Fetch 'top' posts of the week (User Business Rule: Top 100)
+                    url = f"https://www.reddit.com/r/{sub_name}/top.json?t=week&limit=100"
                     response = requests.get(url, headers=headers)
                     
                     if response.status_code == 200:
