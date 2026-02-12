@@ -61,7 +61,18 @@ async function fetchSubredditPosts(subredditName: string): Promise<RedditPost[]>
         // Extract best image
         let imageUrl: string | null = null;
         const preview = p.preview;
-        if (preview?.images?.[0]?.source?.url) {
+
+        // Handle Reddit Galleries (multiple images)
+        if (p.media_metadata) {
+            const firstId = Object.keys(p.media_metadata)[0];
+            const media = p.media_metadata[firstId];
+            if (media?.s?.u) {
+                imageUrl = media.s.u.replace(/&amp;/g, "&");
+            }
+        }
+
+        // Handle Standard Images (preview)
+        if (!imageUrl && preview?.images?.[0]?.source?.url) {
             imageUrl = preview.images[0].source.url.replace(/&amp;/g, "&");
         } else if (p.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
             imageUrl = p.url;
