@@ -58,7 +58,7 @@ graph LR
 1. **Coleta** — Um script Python (`check_design_trends.py`) consulta a API pública do Reddit e busca os top posts da semana de cada subreddit.
 2. **Armazenamento** — Os dados vão para o **Supabase** (PostgreSQL) e também são salvos em um JSON local como fallback.
 3. **Exibição** — O frontend React consome os dados do Supabase (ou do JSON local se o Supabase estiver indisponível) e renderiza em uma interface editorial.
-4. **Automação** — Um **GitHub Actions** workflow roda diariamente às 12:00 UTC, coletando novos dados e fazendo commit automático.
+4. **Automação** — Uma **Supabase Edge Function** (`fetch-reddit`) roda semanalmente (via Cron Job), coletando novos dados, gerando resumos com IA e salvando no banco.
 
 ---
 
@@ -84,7 +84,7 @@ graph LR
 ### Infraestrutura
 | Tecnologia | Uso |
 |-----------|-----|
-| GitHub Actions | CI/CD — coleta diária + deploy |
+| Supabase Cron | Agendamento da coleta semanal |
 | GitHub Pages | Hosting do frontend |
 
 ---

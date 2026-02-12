@@ -55,12 +55,20 @@ def fetch_design_trends():
                             image_url = None
                             preview = p_data.get("preview", {})
                             images = preview.get("images", [])
+                            media_metadata = p_data.get("media_metadata", {})
+
+                            if media_metadata:
+                                # Handle Reddit Gallery
+                                first_id = list(media_metadata.keys())[0]
+                                media = media_metadata[first_id]
+                                if "s" in media and "u" in media["s"]:
+                                    image_url = media["s"]["u"].replace("&amp;", "&")
                             
-                            if images:
+                            if not image_url and images:
                                 image_url = images[0]["source"]["url"].replace("&amp;", "&")
-                            elif p_data.get("url", "").endswith((".jpg", ".jpeg", ".png", ".gif")):
+                            elif not image_url and p_data.get("url", "").endswith((".jpg", ".jpeg", ".png", ".gif")):
                                 image_url = p_data.get("url")
-                            elif p_data.get("thumbnail") and p_data.get("thumbnail").startswith("http"):
+                            elif not image_url and p_data.get("thumbnail") and p_data.get("thumbnail").startswith("http"):
                                 image_url = p_data.get("thumbnail")
 
                             topic_posts.append({
