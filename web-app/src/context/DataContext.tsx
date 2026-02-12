@@ -151,25 +151,38 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
 
                 Object.entries(data).forEach(([category, items]) => {
                     (items as LocalJsonPost[]).forEach((item) => {
+                        const numComments = Number(item.num_comments) || 0;
+                        const score = Number(item.score) || 0;
+                        const subreddit = item.subreddit || 'Design';
+
+                        // Generate synthetic "AI" content since local JSON doesn't have it
+                        const engagementLevel = score > 500 ? 'viral' : score > 100 ? 'popular' : 'de nicho';
+                        const summary = `Uma discussão ${engagementLevel} no r/${subreddit} sobre "${item.title}". A comunidade de design reagiu com ${score} upvotes e ${numComments} comentários.`;
+                        const whyItMatters = `Este tópico reflete tendências atuais em ${category}. A alta taxa de engajamento (${score} pontos) sugere que é um ponto de dor ou interesse comum entre profissionais da área.`;
+
                         const post: Post = {
-                            id: item.permalink?.split('/').slice(-2, -1)[0] || Math.random().toString(36).substr(2, 9),
+                            id: item.permalink?.split('/').filter(Boolean).slice(-2, -1)[0] || Math.random().toString(36).substr(2, 9),
                             title: item.title,
-                            subtitle: `r/${item.subreddit} • ${new Date(item.created_utc * 1000).toLocaleDateString()}`,
+                            subtitle: `r/${subreddit} • ${new Date(item.created_utc * 1000).toLocaleDateString()}`,
                             category: category,
                             image: item.image || item.url || '',
                             date: new Date(item.created_utc * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                            tags: [item.subreddit, 'Design', 'Trend'],
+                            tags: [subreddit, category, 'Design Trend'],
                             content: {
-                                intro: item.title,
-                                whyItMatters: `Trending in r/${item.subreddit} with ${item.score} upvotes.`,
+                                intro: summary,
+                                whyItMatters: whyItMatters,
                                 paragraphs: [
-                                    `This post by u/${item.author} has generated ${item.num_comments} comments.`,
-                                    'Click the button below to view the full discussion and image on Reddit.',
+                                    `A discussão original foi iniciada por u/${item.author} e rapidamente ganhou tração.`,
+                                    `Com ${numComments} comentários, designers estão debatendo ativamente sobre o tema.`,
+                                    'Para entender todos os detalhes e participar, acesse a thread original no Reddit clicando abaixo.',
                                 ],
                             },
                             url: item.permalink?.startsWith('http') ? item.permalink : `https://www.reddit.com${item.permalink}`,
+                            featured: score > 300,
                             week_number: 1,
                             fetched_at: new Date().toISOString(),
+                            num_comments: numComments,
+                            score: score,
                         };
                         allLocalPosts.push(post);
                     });
