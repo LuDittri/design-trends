@@ -19,7 +19,7 @@ export function Category() {
 
   const featuredPost = categoryPosts[0];
   const sidePosts = categoryPosts.slice(1, 3);
-  const remainingPosts = categoryPosts.slice(3);
+  const remainingPosts = categoryPosts.slice(3, 10); // Limit to 7 more posts (Total 10 max)
 
   if (!featuredPost) return <div className="pt-32 px-6 dark:text-white">Nenhum artigo encontrado</div>;
 
