@@ -11,7 +11,7 @@ export function Home() {
   const { posts, availableWeeks, selectedWeek, setSelectedWeek } = useData();
 
   // 1. Get Top 1 post from each category (except Figma)
-  const categoriesToHighlight = ['UI/UX', 'Design Gráfico', 'Design Industrial', 'Cultura'];
+  const categoriesToHighlight = ['UI/UX', 'Design Gráfico', 'Design Industrial'];
   const highlights: any[] = [];
   const highlightedIds = new Set<string>();
 
@@ -27,7 +27,8 @@ export function Home() {
   // We exclude the ones already shown in highlights to avoid duplication
   const latestCurations = posts
     .filter(p => !highlightedIds.has(p.id))
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 8); // Limit to 8 posts max
 
   // Find current week info for the date caption
   const currentWeekInfo = availableWeeks.find(w => w.week_number === selectedWeek);

@@ -27,5 +27,4 @@ export const CATEGORIES = [
   { id: 'visual', label: 'Design Gráfico', description: 'Aesthetics, typography, and color' },
   { id: 'figma', label: 'Figma', description: 'Workflows and technical mastery' },
   { id: 'industrial', label: 'Design Industrial', description: '3D modeling, prototyping, and manufacturing' },
-  { id: 'culture', label: 'Cultura', description: 'Design in the broader context' },
 ];
