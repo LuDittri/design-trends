@@ -189,15 +189,14 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
                         };
                         allLocalPosts.push(post);
                     });
-                });
-
-                setAllPosts(allLocalPosts);
-                setAvailableWeeks([{ week_number: 1, fetched_at: new Date().toISOString() }]);
-                setSelectedWeek(1);
-                setLoading(false);
+                    const errorMessage = 'Supabase client not configured. Cannot fetch posts.';
+                    console.error(errorMessage);
+                    setError(errorMessage);
+                }
             } catch (err: any) {
-                console.error(err);
-                setError(err.message);
+                console.error('Error fetching posts:', err);
+                setError(err.message || 'An unexpected error occurred while fetching posts.');
+            } finally {
                 setLoading(false);
             }
         }
