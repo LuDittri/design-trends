@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter, useLocation } from 'react-router';
+import { Routes, Route, HashRouter, useLocation } from 'react-router';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
@@ -39,7 +39,7 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ThemeProvider>
         <ReadingModeProvider>
           <DataProvider>
@@ -54,7 +54,7 @@ function App() {
           </DataProvider>
         </ReadingModeProvider>
       </ThemeProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

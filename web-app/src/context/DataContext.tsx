@@ -132,7 +132,10 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
 
         async function fetchLocalJSON() {
             try {
-                const res = await fetch('/design_trends.json');
+                // Use BASE_URL to correctly fetch relative to the app root
+                const baseUrl = import.meta.env.BASE_URL;
+                const jsonPath = `${baseUrl}design_trends.json`.replace('//', '/'); // Avoid double slashes if base is './'
+                const res = await fetch(jsonPath);
                 if (!res.ok) throw new Error('Failed to fetch local data');
                 const data = await res.json();
                 const allLocalPosts: Post[] = [];
