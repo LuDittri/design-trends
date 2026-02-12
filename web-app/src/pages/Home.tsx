@@ -10,8 +10,8 @@ export function Home() {
   const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
   const { posts, availableWeeks, selectedWeek, setSelectedWeek } = useData();
 
-  // 1. Get Top 1 post from each category (except Figma)
-  const categoriesToHighlight = ['UI/UX', 'Design Gráfico', 'Design Industrial'];
+  // 1. Get Top 1 post from each category
+  const categoriesToHighlight = ['UI/UX', 'Figma', 'Design Gráfico', 'Design Industrial'];
   const highlights: any[] = [];
   const highlightedIds = new Set<string>();
 
