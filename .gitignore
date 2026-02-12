@@ -21,3 +21,6 @@ Thumbs.db
 # Logs
 logs/
 *.log
+
+# Scripts with secrets
+web-app/populate_supabase.cjs

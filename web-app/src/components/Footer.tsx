@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 import { useReadingMode } from '../context/ReadingModeContext';
 import { Instagram, Linkedin, Layout } from 'lucide-react';
 import { Logo } from './Logo';
-import { FigmaIcon, DesignGraphicIcon } from './Icons';
+import { FigmaIcon, DesignGraphicIcon, IndustrialDesignIcon } from './Icons';
 
 export function Footer() {
   const { isReadingMode } = useReadingMode();
@@ -39,6 +39,11 @@ export function Footer() {
               <li>
                 <Link to="/category/visual" className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors text-sm flex items-center gap-2">
                   <DesignGraphicIcon className="w-4 h-4" /> Design gráfico
+                </Link>
+              </li>
+              <li>
+                <Link to="/category/industrial" className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors text-sm flex items-center gap-2">
+                  <IndustrialDesignIcon className="w-4 h-4" /> Design industrial
                 </Link>
               </li>
             </ul>

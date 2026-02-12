@@ -1,14 +1,13 @@
-import { useState } from 'react';
+
 import { useData } from '../context/DataContext';
 import { Link, useParams } from 'react-router';
-import { ArrowLeft, ArrowRight, Share2, Bookmark, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ParallaxImage } from '../components/ParallaxImage';
 import { useReadingMode } from '../context/ReadingModeContext';
-import { ImageWithFallback } from '../components/figma/ImageWithFallback';
-import svgPaths from '../imports/svg-afacozdf1l';
 
-// ... (IcBaselineReddit component kept as is)
+import { Typewriter } from '../components/Typewriter';
+import svgPaths from '../imports/svg-afacozdf1l';
 
 // Reddit Icon Component
 function IcBaselineReddit() {
@@ -27,7 +26,7 @@ function IcBaselineReddit() {
 export function Post() {
   const { id } = useParams();
   const { isReadingMode, toggleReadingMode } = useReadingMode();
-  const [expanded, setExpanded] = useState(true);
+
   const { posts } = useData();
 
   // Find the post
@@ -63,8 +62,6 @@ export function Post() {
               <span className="px-3 py-1 border border-gray-200 dark:border-white/20 rounded-full text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 {post.category}
               </span>
-              <span className="text-gray-300 dark:text-gray-600">•</span>
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{post.readTime}</span>
             </motion.div>
           )}
 
@@ -73,8 +70,8 @@ export function Post() {
           </h1>
 
           {!isReadingMode && (
-            <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-serif">
-              {post.subtitle}
+            <p className="text-xl md:text-2xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto leading-[1.8] tracking-wide font-light">
+              <Typewriter text={post.subtitle} />
             </p>
           )}
         </div>
@@ -118,14 +115,7 @@ export function Post() {
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-4 border-t border-gray-100 dark:border-white/10">
-                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-black dark:text-white">
-                  <Share2 className="w-5 h-5" />
-                </button>
-                <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-black dark:text-white">
-                  <Bookmark className="w-5 h-5" />
-                </button>
-              </div>
+
             </div>
           )}
 
@@ -137,27 +127,13 @@ export function Post() {
 
             {/* Expandable Insight Block */}
             {!isReadingMode && (
-              <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-8 mb-12 cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-white/10" onClick={() => setExpanded(!expanded)}>
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-bold flex items-center gap-2 text-black dark:text-white">
-                    <span className="w-2 h-2 bg-black dark:bg-white rounded-full" />
-                    Por que isso importa
-                  </h3>
-                  <span className="text-2xl text-black dark:text-white">{expanded ? '−' : '+'}</span>
-                </div>
-                <AnimatePresence>
-                  {(expanded || !expanded) && (
-                    <motion.div
-                      initial={false}
-                      animate={{ height: expanded ? 'auto' : '3.5rem', opacity: 1 }}
-                      className="overflow-hidden"
-                    >
-                      <p className="text-gray-600 dark:text-gray-400 leading-relaxed pt-2">
-                        {post.content.whyItMatters}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+              <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-8 mb-12">
+                <h3 className="text-lg font-bold mb-2 text-black dark:text-white">
+                  Por que isso importa
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed pt-2">
+                  {post.content.whyItMatters}
+                </p>
               </div>
             )}
 

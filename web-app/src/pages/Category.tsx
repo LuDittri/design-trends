@@ -2,25 +2,24 @@ import { useParams } from 'react-router';
 import { CATEGORIES } from '../lib/data';
 import { useData } from '../context/DataContext';
 import { TrendCard } from '../components/TrendCard';
+import { Typewriter } from '../components/Typewriter';
 
 export function Category() {
   const { id } = useParams();
   const { posts } = useData();
-  const category = CATEGORIES.find(c => c.id === id);
-  // Default to showing all if 'all' or category not found (for demo purposes)
-  const categoryLabel = category?.label || (id === 'all' ? 'Todos' : 'Design Gráfico');
 
-  // Filter posts for this category
-  const filteredPosts = posts.filter(p => id === 'all' || !id || p.category.toLowerCase().includes(category?.label.toLowerCase() || ''));
+  // Find category label
+  const categoryInfo = CATEGORIES.find(c => c.id === id);
+  const categoryLabel = categoryInfo?.label || id || '';
 
-  // Ensure we have enough posts to fill the layout. If not, just repeat them for visual completeness
-  const displayPosts = filteredPosts.length < 6
-    ? [...filteredPosts, ...posts].slice(0, 10)
-    : filteredPosts;
+  // Filter and sort posts for this category
+  const categoryPosts = id === 'all'
+    ? posts
+    : posts.filter(p => p.category === categoryLabel);
 
-  const featuredPost = displayPosts[0];
-  const sidePosts = displayPosts.slice(1, 3);
-  const remainingPosts = displayPosts.slice(3);
+  const featuredPost = categoryPosts[0];
+  const sidePosts = categoryPosts.slice(1, 3);
+  const remainingPosts = categoryPosts.slice(3);
 
   if (!featuredPost) return <div className="pt-32 px-6 dark:text-white">Nenhum artigo encontrado</div>;
 
@@ -41,9 +40,9 @@ export function Category() {
             </div>
           </div>
         </div>
-        <div className="mt-8 max-w-lg">
-          <p className="text-xl text-gray-500 dark:text-gray-400 leading-relaxed">
-            Explorando as últimas tendências e discussões sobre {categoryLabel.toLowerCase()}.
+        <div className="mt-8 max-w-2xl">
+          <p className="text-lg md:text-xl text-gray-500 dark:text-gray-400 leading-[1.8] tracking-wide font-light">
+            <Typewriter text={`Explorando as últimas tendências e discussões sobre ${categoryLabel.toLowerCase()}.`} />
           </p>
         </div>
       </section>
@@ -60,9 +59,12 @@ export function Category() {
             <TrendCard
               id={featuredPost.id}
               title={featuredPost.title}
+              subtitle={featuredPost.subtitle}
               category={featuredPost.category}
               image={featuredPost.image}
-              date={featuredPost.date}
+
+              numComments={featuredPost.num_comments}
+              score={featuredPost.score}
               size="large"
               className="h-full"
               hideArrow
@@ -76,9 +78,12 @@ export function Category() {
                 key={`${post.id}-${idx}`}
                 id={post.id}
                 title={post.title}
+                subtitle={post.subtitle}
                 category={post.category}
                 image={post.image}
-                date={post.date}
+
+                numComments={post.num_comments}
+                score={post.score}
                 className="flex-1 min-h-[250px]"
                 hideArrow
               />
@@ -90,16 +95,19 @@ export function Category() {
       {/* Todos os artigos (Remaining) - Simple Grid */}
       {remainingPosts.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Todos os artigos</h2>
+          <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Demais artigos</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
             {remainingPosts.map((post, idx) => (
               <TrendCard
                 key={`${post.id}-remaining-${idx}`}
                 id={post.id}
                 title={post.title}
+                subtitle={post.subtitle}
                 category={post.category}
                 image={post.image}
-                date={post.date}
+
+                numComments={post.num_comments}
+                score={post.score}
                 size="small"
                 className="h-[320px]"
                 hideArrow

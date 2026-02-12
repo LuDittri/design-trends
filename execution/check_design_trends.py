@@ -21,7 +21,8 @@ load_dotenv()
 TOPICS = {
     "UI/UX": ["UIUX", "UXDesign", "UI_Design"],
     "Figma": ["FigmaDesign"],
-    "Graphic Design": ["graphic_design", "Design"]
+    "Graphic Design": ["graphic_design", "Design", "designBR"],
+    "Design Industrial": ["IndustrialDesign", "3Dprinting", "Impressao3D", "3Dmodeling", "3Drequests", "blender"]
 }
 
 def fetch_design_trends():
@@ -85,11 +86,11 @@ def fetch_design_trends():
                 except Exception as e:
                     logging.error(f"    Error fetching r/{sub_name}: {e}")
 
-            # Sort by score descending and take top 5
+            # Sort by score descending and take top 10
             topic_posts.sort(key=lambda x: x["score"], reverse=True)
-            top_5 = topic_posts[:5]
+            top_10 = topic_posts[:10]
             
-            results[topic] = top_5
+            results[topic] = top_10
             
         # Validate that we actually got data
         total_posts = sum(len(posts) for posts in results.values())

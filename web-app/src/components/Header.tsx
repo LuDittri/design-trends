@@ -3,7 +3,7 @@ import { Home, Layout, Sun, Moon, Menu, X } from 'lucide-react';
 import { useReadingMode } from '../context/ReadingModeContext';
 import { useTheme } from '../context/ThemeContext';
 import { Logo } from './Logo';
-import { FigmaIcon, DesignGraphicIcon } from './Icons';
+import { FigmaIcon, DesignGraphicIcon, IndustrialDesignIcon } from './Icons';
 import { useState, useEffect } from 'react';
 
 export function Header() {
@@ -47,6 +47,9 @@ export function Header() {
             </Link>
             <Link to="/category/visual" className="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2 uppercase tracking-wide">
               <DesignGraphicIcon className="w-3 h-3" /> Design gráfico
+            </Link>
+            <Link to="/category/industrial" className="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2 uppercase tracking-wide">
+              <IndustrialDesignIcon className="w-3 h-3" /> Design industrial
             </Link>
           </nav>
 
@@ -104,11 +107,8 @@ export function Header() {
               padding: '2rem 1.5rem',
             }}
           >
-            <Link
-              to="/"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-              style={{
+            {(() => {
+              const linkStyle: React.CSSProperties = {
                 fontSize: '1.125rem',
                 fontWeight: 500,
                 textTransform: 'uppercase',
@@ -116,58 +116,31 @@ export function Header() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '1rem',
-              }}
-            >
-              <Home style={{ width: '1.25rem', height: '1.25rem' }} /> Início
-            </Link>
-            <Link
-              to="/category/ui-ux"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-              style={{
-                fontSize: '1.125rem',
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-              }}
-            >
-              <Layout style={{ width: '1.25rem', height: '1.25rem' }} /> UI/UX
-            </Link>
-            <Link
-              to="/category/figma"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-              style={{
-                fontSize: '1.125rem',
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-              }}
-            >
-              <FigmaIcon style={{ width: '1.25rem', height: '1.25rem' }} /> Figma
-            </Link>
-            <Link
-              to="/category/visual"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-              style={{
-                fontSize: '1.125rem',
-                fontWeight: 500,
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-              }}
-            >
-              <DesignGraphicIcon style={{ width: '1.25rem', height: '1.25rem' }} /> Design gráfico
-            </Link>
+              };
+              const iconStyle = { width: '1.25rem', height: '1.25rem' };
+              const linkClass = "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors";
+              const close = () => setIsMenuOpen(false);
+
+              return (
+                <>
+                  <Link to="/" onClick={close} className={linkClass} style={linkStyle}>
+                    <Home style={iconStyle} /> Início
+                  </Link>
+                  <Link to="/category/ui-ux" onClick={close} className={linkClass} style={linkStyle}>
+                    <Layout style={iconStyle} /> UI/UX
+                  </Link>
+                  <Link to="/category/figma" onClick={close} className={linkClass} style={linkStyle}>
+                    <FigmaIcon style={iconStyle} /> Figma
+                  </Link>
+                  <Link to="/category/visual" onClick={close} className={linkClass} style={linkStyle}>
+                    <DesignGraphicIcon style={iconStyle} /> Design gráfico
+                  </Link>
+                  <Link to="/category/industrial" onClick={close} className={linkClass} style={linkStyle}>
+                    <IndustrialDesignIcon style={iconStyle} /> Design industrial
+                  </Link>
+                </>
+              );
+            })()}
           </nav>
         </div>
       )}

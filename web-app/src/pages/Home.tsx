@@ -1,18 +1,36 @@
 import { useRef, useState, useEffect } from 'react';
 import { TrendCard } from '../components/TrendCard';
-
+import { Typewriter } from '../components/Typewriter';
+import { ChevronDown } from 'lucide-react';
 import { useData } from '../context/DataContext';
 
 export function Home() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const { posts } = useData();
+  const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
+  const { posts, availableWeeks, selectedWeek, setSelectedWeek } = useData();
 
   // Use the first 3 posts for the "Destaques" carousel
   const trends = posts.slice(0, 3);
 
   // Use the next 4 posts for the "Últimas curadorias" section
   const curations = posts.slice(3, 7);
+
+  // Find current week info for the date caption
+  const currentWeekInfo = availableWeeks.find(w => w.week_number === selectedWeek);
+  const referenceDate = currentWeekInfo?.fetched_at
+    ? new Date(currentWeekInfo.fetched_at).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    })
+    : '';
+
+  // Calculate relative week index (latest = highest number)
+  const sortedWeeks = [...availableWeeks].sort((a, b) => a.week_number - b.week_number);
+  const weekDisplayIndex = selectedWeek
+    ? sortedWeeks.findIndex(w => w.week_number === selectedWeek) + 1
+    : 1;
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -31,34 +49,73 @@ export function Home() {
     }
   }, []);
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = () => setWeekDropdownOpen(false);
+    if (weekDropdownOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [weekDropdownOpen]);
+
   return (
     <div className="min-h-screen pt-32 pb-8 px-6 md:px-12 max-w-[1920px] mx-auto bg-white dark:bg-black transition-colors duration-300">
 
       {/* Title Section */}
       <div className="mb-16 md:mb-24">
         <div className="flex flex-col md:flex-row justify-between items-end relative gap-12 md:gap-0">
-          <div>
+          <div className="max-w-[700px]">
             <h1 className="text-8xl md:text-[128px] font-bold tracking-[-0.04em] text-black dark:text-white leading-[0.9]">
               Design<br />Trends
             </h1>
+            <p className="mt-8 md:mt-10 text-lg md:text-xl text-gray-500 dark:text-gray-400 leading-[1.8] tracking-wide font-light max-w-[420px]">
+              <Typewriter text={"Toda segunda-feira, analisamos milhares de discussões em comunidades\nde design no Reddit e destacamos as 10 tendências mais relevantes por categoria."} />
+            </p>
           </div>
           <div className="text-right pb-4 flex flex-col items-end md:absolute md:right-0 md:bottom-2">
-            <div className="mb-2">
+            <div className="mb-1">
               <span className="text-[12px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-[0.05em] block text-right mb-1">EDIÇÃO ATUAL</span>
-              <span className="text-[30px] font-normal text-black dark:text-white block leading-none">Semana 1</span>
+              <div className="relative inline-block">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setWeekDropdownOpen(!weekDropdownOpen); }}
+                  className="flex items-center gap-2 text-[30px] font-normal text-black dark:text-white leading-none hover:opacity-70 transition-opacity cursor-pointer"
+                >
+                  Semana {weekDisplayIndex}
+                  <ChevronDown size={20} className={`transition-transform duration-200 ${weekDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown */}
+                {weekDropdownOpen && availableWeeks.length > 1 && (
+                  <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[180px] overflow-hidden">
+                    {sortedWeeks.map((week, idx) => {
+                      const weekDate = new Date(week.fetched_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                      return (
+                        <button
+                          key={week.week_number}
+                          onClick={(e) => { e.stopPropagation(); setSelectedWeek(week.week_number); setWeekDropdownOpen(false); }}
+                          className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-between ${selectedWeek === week.week_number ? 'bg-gray-50 dark:bg-gray-800 font-medium' : ''}`}
+                        >
+                          <span className="text-black dark:text-white">Semana {idx + 1}</span>
+                          <span className="text-gray-400 dark:text-gray-500 text-xs">{weekDate}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
+            {referenceDate && (
+              <span className="text-[11px] font-normal text-gray-400 dark:text-gray-500 tracking-wide">
+                {referenceDate}
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       {/* Carousel Section */}
       <div className="space-y-6 mb-24">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[48px] font-bold tracking-[-0.025em] leading-none text-black dark:text-white">Destaques</h2>
-          <div className="hidden md:flex gap-2">
-            {/* Desktop Navigation could go here */}
-          </div>
-        </div>
+        <h2 className="text-[48px] font-bold tracking-[-0.025em] leading-none text-black dark:text-white">Destaques</h2>
 
         <div
           ref={scrollContainerRef}
@@ -69,9 +126,12 @@ export function Home() {
               <TrendCard
                 id={trend.id}
                 title={trend.title}
+                subtitle={trend.subtitle}
                 category={trend.category}
                 image={trend.image}
-                date={trend.date}
+
+                numComments={trend.num_comments}
+                score={trend.score}
                 size="large"
                 className="h-[400px] md:h-[500px]"
               />
@@ -103,9 +163,12 @@ export function Home() {
               key={item.id}
               id={item.id}
               title={item.title}
+              subtitle={item.subtitle}
               category={item.category}
               image={item.image}
-              date={item.date}
+
+              numComments={item.num_comments}
+              score={item.score}
               size="small"
               className="h-[320px]"
               hideArrow

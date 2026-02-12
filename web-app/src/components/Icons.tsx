@@ -39,3 +39,16 @@ export function DesignGraphicIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function IndustrialDesignIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      {/* Gear */}
+      <circle cx="12" cy="10" r="3" />
+      <path d="M12 5v-1M12 16v-1M7.05 7.05l-.7-.7M17.65 12.95l-.7-.7M5 10H4M20 10h-1M7.05 12.95l-.7.7M17.65 7.05l-.7.7" />
+      {/* Ruler at bottom */}
+      <path d="M3 19h18" />
+      <path d="M5 19v-2M8 19v-1.5M11 19v-2M14 19v-1.5M17 19v-2M20 19v-1.5" />
+    </svg>
+  );
+}
