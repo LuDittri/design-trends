@@ -78,7 +78,7 @@ export function Post() {
 
         {/* Hero Image - Hidden in Reading Mode */}
         <AnimatePresence>
-          {!isReadingMode && (
+          {!isReadingMode && post.image && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
