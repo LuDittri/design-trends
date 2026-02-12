@@ -132,67 +132,13 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
 
         async function fetchLocalJSON() {
             try {
-                // Use BASE_URL to correctly fetch relative to the app root
-                const baseUrl = import.meta.env.BASE_URL;
-                const jsonPath = `${baseUrl}design_trends.json`.replace('//', '/'); // Avoid double slashes if base is './'
-                const res = await fetch(jsonPath);
-                if (!res.ok) throw new Error('Failed to fetch local data');
-                const data = await res.json();
-                const allLocalPosts: Post[] = [];
-
-                interface LocalJsonPost {
-                    permalink?: string;
-                    title: string;
-                    subreddit: string;
-                    created_utc: number;
-                    image?: string;
-                    url?: string;
-                    score: number;
-                    num_comments: number;
-                    author: string;
-                }
-
-                Object.entries(data).forEach(([category, items]) => {
-                    (items as LocalJsonPost[]).forEach((item) => {
-                        const numComments = Number(item.num_comments) || 0;
-                        const score = Number(item.score) || 0;
-                        const subreddit = item.subreddit || 'Design';
-
-                        // Generate synthetic "AI" content since local JSON doesn't have it
-                        const engagementLevel = score > 500 ? 'viral' : score > 100 ? 'popular' : 'de nicho';
-                        const summary = `Uma discussão ${engagementLevel} no r/${subreddit} sobre "${item.title}". A comunidade de design reagiu com ${score} upvotes e ${numComments} comentários.`;
-                        const whyItMatters = `Este tópico reflete tendências atuais em ${category}. A alta taxa de engajamento (${score} pontos) sugere que é um ponto de dor ou interesse comum entre profissionais da área.`;
-
-                        const post: Post = {
-                            id: item.permalink?.split('/').filter(Boolean).slice(-2, -1)[0] || Math.random().toString(36).substr(2, 9),
-                            title: item.title,
-                            subtitle: `r/${subreddit} • ${new Date(item.created_utc * 1000).toLocaleDateString()}`,
-                            category: category,
-                            image: item.image || item.url || '',
-                            date: new Date(item.created_utc * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                            tags: [subreddit, category, 'Design Trend'],
-                            content: {
-                                intro: summary,
-                                whyItMatters: whyItMatters,
-                                paragraphs: [
-                                    `A discussão original foi iniciada por u/${item.author} e rapidamente ganhou tração.`,
-                                    `Com ${numComments} comentários, designers estão debatendo ativamente sobre o tema.`,
-                                    'Para entender todos os detalhes e participar, acesse a thread original no Reddit clicando abaixo.',
-                                ],
-                            },
-                            url: item.permalink?.startsWith('http') ? item.permalink : `https://www.reddit.com${item.permalink}`,
-                            featured: score > 300,
-                            week_number: 1,
-                            fetched_at: new Date().toISOString(),
-                            num_comments: numComments,
-                            score: score,
-                        };
-                        allLocalPosts.push(post);
-                    });
+                if (!supabase) {
                     const errorMessage = 'Supabase client not configured. Cannot fetch posts.';
                     console.error(errorMessage);
                     setError(errorMessage);
+                    return;
                 }
+
             } catch (err: any) {
                 console.error('Error fetching posts:', err);
                 setError(err.message || 'An unexpected error occurred while fetching posts.');
