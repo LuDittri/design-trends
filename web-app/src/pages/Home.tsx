@@ -10,11 +10,24 @@ export function Home() {
   const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
   const { posts, availableWeeks, selectedWeek, setSelectedWeek } = useData();
 
-  // Use the first 3 posts for the "Destaques" carousel
-  const trends = posts.slice(0, 3);
+  // 1. Get Top 1 post from each category (except Figma)
+  const categoriesToHighlight = ['UI/UX', 'Design Gráfico', 'Design Industrial', 'Cultura'];
+  const highlights: any[] = [];
+  const highlightedIds = new Set<string>();
 
-  // Use the next 4 posts for the "Últimas curadorias" section
-  const curations = posts.slice(3, 7);
+  categoriesToHighlight.forEach(catLabel => {
+    const topPost = posts.find(p => p.category === catLabel);
+    if (topPost) {
+      highlights.push(topPost);
+      highlightedIds.add(topPost.id);
+    }
+  });
+
+  // 2. Get "Latest Curations" - all other posts sorted by date
+  // We exclude the ones already shown in highlights to avoid duplication
+  const latestCurations = posts
+    .filter(p => !highlightedIds.has(p.id))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   // Find current week info for the date caption
   const currentWeekInfo = availableWeeks.find(w => w.week_number === selectedWeek);
@@ -113,15 +126,15 @@ export function Home() {
         </div>
       </div>
 
-      {/* Carousel Section */}
+      {/* Carousel Section (Highlights) */}
       <div className="space-y-6 mb-24">
         <h2 className="text-[48px] font-bold tracking-[-0.025em] leading-none text-black dark:text-white">Destaques</h2>
 
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:overflow-visible md:snap-none"
+          className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:snap-none"
         >
-          {trends.map((trend) => (
+          {highlights.map((trend) => (
             <div key={trend.id} className="min-w-[85vw] md:min-w-0 snap-center">
               <TrendCard
                 id={trend.id}
@@ -141,7 +154,7 @@ export function Home() {
 
         {/* Mobile Pagination Dots */}
         <div className="flex justify-center gap-2 md:hidden">
-          {trends.map((_, index) => (
+          {highlights.map((_, index) => (
             <div
               key={index}
               className={`w-2 h-2 rounded-full transition-colors duration-300 ${index === activeIndex ? 'bg-black dark:bg-white' : 'bg-gray-300 dark:bg-gray-700'
@@ -158,7 +171,7 @@ export function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
-          {curations.map((item) => (
+          {latestCurations.map((item) => (
             <TrendCard
               key={item.id}
               id={item.id}
