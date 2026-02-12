@@ -58,68 +58,71 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         async function fetchPosts() {
             try {
-                // Try Supabase first
-                const { data: supabasePosts, error: supabaseError } = await supabase
-                    .from('posts')
-                    .select('*')
-                    .order('score', { ascending: false });
+                // Try Supabase first (only if client is configured)
+                if (supabase) {
+                    const { data: supabasePosts, error: supabaseError } = await supabase
+                        .from('posts')
+                        .select('*')
+                        .order('score', { ascending: false });
 
-                if (!supabaseError && supabasePosts && supabasePosts.length > 0) {
-                    // Map Supabase data to Post interface
-                    const mappedPosts: Post[] = supabasePosts.map((item: SupabasePost) => ({
-                        id: item.reddit_id,
-                        title: item.title,
-                        subtitle: `r/${item.subreddit} • ${new Date(item.created_utc).toLocaleDateString()}`,
-                        category: item.category,
-                        image: item.image_url || '',
-                        date: new Date(item.created_utc).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                        }),
-                        tags: item.ai_tags || [item.subreddit, 'Design'],
-                        content: {
-                            intro: item.ai_summary || item.title,
-                            whyItMatters: item.ai_why_it_matters || `Trending em r/${item.subreddit} com ${item.score} upvotes.`,
-                            paragraphs: [
-                                `Este post de u/${item.author} gerou ${item.num_comments} comentários.`,
-                                'Clique no botão abaixo para ver a discussão completa no Reddit.',
-                            ],
-                        },
-                        url: item.permalink?.startsWith('http') ? item.permalink : `https://www.reddit.com${item.permalink}`,
-                        featured: item.featured || false,
-                        week_number: item.week_number,
-                        fetched_at: item.fetched_at,
-                        num_comments: item.num_comments || 0,
-                        score: item.score || 0,
-                    }));
+                    if (!supabaseError && supabasePosts && supabasePosts.length > 0) {
+                        // Map Supabase data to Post interface
+                        const mappedPosts: Post[] = supabasePosts.map((item: SupabasePost) => ({
+                            id: item.reddit_id,
+                            title: item.title,
+                            subtitle: `r/${item.subreddit} • ${new Date(item.created_utc).toLocaleDateString()}`,
+                            category: item.category,
+                            image: item.image_url || '',
+                            date: new Date(item.created_utc).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                            }),
+                            tags: item.ai_tags || [item.subreddit, 'Design'],
+                            content: {
+                                intro: item.ai_summary || item.title,
+                                whyItMatters: item.ai_why_it_matters || `Trending em r/${item.subreddit} com ${item.score} upvotes.`,
+                                paragraphs: [
+                                    `Este post de u/${item.author} gerou ${item.num_comments} comentários.`,
+                                    'Clique no botão abaixo para ver a discussão completa no Reddit.',
+                                ],
+                            },
+                            url: item.permalink?.startsWith('http') ? item.permalink : `https://www.reddit.com${item.permalink}`,
+                            featured: item.featured || false,
+                            week_number: item.week_number,
+                            fetched_at: item.fetched_at,
+                            num_comments: item.num_comments || 0,
+                            score: item.score || 0,
+                        }));
 
-                    // Extract available weeks with their dates
-                    const weeksMap = new Map<number, string>();
-                    mappedPosts.forEach(p => {
-                        if (p.week_number && p.fetched_at && !weeksMap.has(p.week_number)) {
-                            weeksMap.set(p.week_number, p.fetched_at);
+                        // Extract available weeks with their dates
+                        const weeksMap = new Map<number, string>();
+                        mappedPosts.forEach(p => {
+                            if (p.week_number && p.fetched_at && !weeksMap.has(p.week_number)) {
+                                weeksMap.set(p.week_number, p.fetched_at);
+                            }
+                        });
+
+                        const weeks: WeekInfo[] = Array.from(weeksMap.entries())
+                            .map(([week_number, fetched_at]) => ({ week_number, fetched_at }))
+                            .sort((a, b) => b.week_number - a.week_number);
+
+                        setAvailableWeeks(weeks);
+                        setAllPosts(mappedPosts);
+
+                        // Default to the latest week
+                        if (weeks.length > 0) {
+                            setSelectedWeek(weeks[0].week_number);
                         }
-                    });
 
-                    const weeks: WeekInfo[] = Array.from(weeksMap.entries())
-                        .map(([week_number, fetched_at]) => ({ week_number, fetched_at }))
-                        .sort((a, b) => b.week_number - a.week_number);
-
-                    setAvailableWeeks(weeks);
-                    setAllPosts(mappedPosts);
-
-                    // Default to the latest week
-                    if (weeks.length > 0) {
-                        setSelectedWeek(weeks[0].week_number);
+                        setLoading(false);
+                        return;
                     }
-
-                    setLoading(false);
-                    return;
+                    console.warn('Supabase empty or error, falling back to local JSON...', supabaseError?.message);
+                } else {
+                    console.warn('Supabase client not configured, falling back to local JSON...');
                 }
 
-                // Fallback: local JSON file
-                console.warn('Supabase empty or error, falling back to local JSON...', supabaseError?.message);
                 await fetchLocalJSON();
             } catch (err) {
                 console.error('Supabase fetch failed, trying local JSON...', err);
