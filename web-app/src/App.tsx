@@ -1,4 +1,6 @@
 import { Routes, Route, HashRouter, useLocation } from 'react-router';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useData } from './context/DataContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -84,6 +86,8 @@ function AppContent() {
         <AnimatedRoutes />
       </main>
       <Footer />
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 }
