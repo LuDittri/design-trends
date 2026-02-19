@@ -18,6 +18,10 @@ logging.basicConfig(
 
 load_dotenv()
 
+# Reddit OAuth credentials
+REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID", "")
+REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET", "")
+
 TOPICS = {
     "UI/UX": ["UIUX", "UXDesign", "UI_Design"],
     "Figma": ["FigmaDesign"],
@@ -25,10 +29,46 @@ TOPICS = {
     "Design Industrial": ["IndustrialDesign", "3Dprinting", "Impressao3D", "3Dmodeling", "3Drequests", "blender"]
 }
 
+def get_reddit_token():
+    """Get OAuth token from Reddit using client credentials."""
+    if not REDDIT_CLIENT_ID or not REDDIT_CLIENT_SECRET:
+        logging.warning("No Reddit OAuth credentials found. Using unauthenticated requests.")
+        return None
+    
+    auth = requests.auth.HTTPBasicAuth(REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET)
+    data = {"grant_type": "client_credentials"}
+    headers = {"User-Agent": "script:design_trends:v2.0 (by /u/ditrstudio)"}
+    
+    try:
+        response = requests.post("https://www.reddit.com/api/v1/access_token", auth=auth, data=data, headers=headers)
+        if response.status_code == 200:
+            token = response.json().get("access_token")
+            logging.info("✅ Reddit OAuth token obtained successfully")
+            return token
+        else:
+            logging.error(f"Failed to get Reddit token: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        logging.error(f"Error getting Reddit token: {e}")
+        return None
+
 def fetch_design_trends():
-    headers = {
-        "User-Agent": "script:design_trends_public:v1.0 (by /u/anonymous)"
-    }
+    # Get OAuth token
+    token = get_reddit_token()
+    
+    if token:
+        # Use authenticated API (oauth.reddit.com)
+        base_url = "https://oauth.reddit.com"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "User-Agent": "script:design_trends:v2.0 (by /u/ditrstudio)"
+        }
+    else:
+        # Fallback: unauthenticated (works from residential IPs only)
+        base_url = "https://www.reddit.com"
+        headers = {
+            "User-Agent": "script:design_trends_public:v1.0 (by /u/anonymous)"
+        }
     
     results = {}
     
@@ -41,7 +81,7 @@ def fetch_design_trends():
                 logging.info(f"  Fetching top posts from r/{sub_name}...")
                 try:
                     # Fetch 'top' posts of the week (User Business Rule: Top 100)
-                    url = f"https://www.reddit.com/r/{sub_name}/top.json?t=week&limit=100"
+                    url = f"{base_url}/r/{sub_name}/top.json?t=week&limit=100"
                     response = requests.get(url, headers=headers)
                     
                     if response.status_code == 200:
