@@ -11,9 +11,9 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AnimatePresence } from 'motion/react';
 import { PageTransition } from './components/PageTransition';
 import { DataProvider } from './context/DataContext';
+import { Home } from './pages/Home';
 
-// Lazy load pages for code splitting
-const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
+// Lazy load secondary pages only
 const Category = lazy(() => import('./pages/Category').then(m => ({ default: m.Category })));
 const Post = lazy(() => import('./pages/Post').then(m => ({ default: m.Post })));
 
