@@ -46,6 +46,7 @@ interface TrendCardProps {
   className?: string;
   size?: 'small' | 'large';
   hideArrow?: boolean;
+  priority?: boolean;
 }
 
 export function TrendCard({
@@ -59,7 +60,8 @@ export function TrendCard({
   score,
   className = '',
   size = 'small',
-  hideArrow = false
+  hideArrow = false,
+  priority = false
 }: TrendCardProps) {
 
   const hasImage = image && image.trim() !== '' && !image.startsWith('https://www.reddit.com') && !image.endsWith('.com') && !image.endsWith('.com/');
@@ -71,7 +73,7 @@ export function TrendCard({
       <div className="absolute inset-0 z-0">
         {hasImage ? (
           <>
-            <ImageWithFallback src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <ImageWithFallback src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" priority={priority} />
             <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
           </>
         ) : (

@@ -139,7 +139,7 @@ export function Home() {
           ref={scrollContainerRef}
           className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:snap-none"
         >
-          {highlights.map((trend) => (
+          {highlights.map((trend, index) => (
             <div key={trend.id} className="min-w-[85vw] md:min-w-0 snap-center">
               <TrendCard
                 id={trend.id}
@@ -152,6 +152,7 @@ export function Home() {
                 score={trend.score}
                 size="large"
                 className="h-[400px] md:h-[500px]"
+                priority={index < 2}
               />
             </div>
           ))}

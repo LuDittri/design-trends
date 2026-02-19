@@ -5,7 +5,16 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
   <title>Design Trends | DITR</title>
+
+  <!-- Preconnect to critical origins -->
+  <link rel="preconnect" href="https://flcptmcmrlfkbmcuquom.supabase.co" crossorigin />
+  <link rel="dns-prefetch" href="https://flcptmcmrlfkbmcuquom.supabase.co" />
+  <link rel="preconnect" href="https://preview.redd.it" crossorigin />
+  <link rel="dns-prefetch" href="https://preview.redd.it" />
+  <link rel="preconnect" href="https://i.redd.it" crossorigin />
+  <link rel="dns-prefetch" href="https://i.redd.it" />
 
   <!-- SEO & OpenGraph -->
   <meta name="description"
@@ -24,7 +33,49 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <!-- Inline loading skeleton for faster FCP -->
+    <style>
+      .skeleton-loading {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .skeleton-loading {
+          background: #000;
+          color: #fff;
+        }
+
+        .skeleton-spinner {
+          border-color: #fff;
+          border-top-color: transparent;
+        }
+      }
+
+      .skeleton-spinner {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #000;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+    <div class="skeleton-loading">
+      <div class="skeleton-spinner"></div>
+    </div>
+  </div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 

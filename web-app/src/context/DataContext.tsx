@@ -62,7 +62,7 @@ export const DataProvider = ({ children }: { children: React.ReactNode }) => {
                 if (supabase) {
                     const { data: supabasePosts, error: supabaseError } = await supabase
                         .from('posts')
-                        .select('*')
+                        .select('reddit_id,title,subreddit,category,image_url,created_utc,author,score,num_comments,ai_summary,ai_why_it_matters,ai_tags,permalink,featured,week_number,fetched_at')
                         .order('score', { ascending: false });
 
                     if (!supabaseError && supabasePosts && supabasePosts.length > 0) {
