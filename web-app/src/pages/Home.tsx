@@ -83,8 +83,8 @@ export function Home() {
             <h1 className="text-8xl md:text-[128px] font-bold tracking-[-0.04em] text-black dark:text-white leading-[0.9]">
               Design<br />Trends
             </h1>
-            <p className="mt-8 md:mt-10 text-lg md:text-xl text-gray-500 dark:text-gray-400 leading-[1.8] tracking-wide font-light max-w-[420px]">
-              <Typewriter text={"Toda segunda-feira, analisamos milhares de discussões em comunidades\nde design no Reddit e destacamos as 10 tendências mais relevantes por categoria."} />
+            <p className="mt-8 md:mt-10 text-lg md:text-xl text-gray-500 dark:text-gray-400 leading-[1.8] tracking-wide font-light max-w-[420px] lg:max-w-[480px]">
+              <Typewriter text={"Toda segunda-feira, analisamos milhares de discussões em comunidades de design no Reddit e destacamos as 10 tendências mais relevantes por categoria."} />
             </p>
           </div>
           <div className="text-right pb-4 flex flex-col items-end md:absolute md:right-0 md:bottom-2">

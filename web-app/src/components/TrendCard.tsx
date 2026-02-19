@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { ArrowUpRight, MessageSquare, ThumbsUp } from 'lucide-react';
+import { ArrowUpRight, MessageSquare } from 'lucide-react';
+import { UpvoteIcon } from './Icons';
 
 // 12 gradient patterns for visual variety
 const GRADIENT_PATTERNS = [
@@ -122,7 +123,7 @@ export function TrendCard({
                 <span>{numComments != null ? (numComments >= 1000 ? `${(numComments / 1000).toFixed(1)}k` : numComments) : '—'}</span>
               </div>
               <div className="flex items-center gap-1 text-[10px] text-white/90 font-medium border-l border-white/20 pl-2">
-                <ThumbsUp className="w-3 h-3" />
+                <UpvoteIcon className="w-3 h-3" />
                 <span>{score != null ? (score >= 1000 ? `${(score / 1000).toFixed(1)}k` : score) : '—'}</span>
               </div>
             </div>

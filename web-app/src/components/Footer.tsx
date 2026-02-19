@@ -53,12 +53,12 @@ export function Footer() {
             <h3 className="font-bold text-sm mb-6 text-black dark:text-white">Redes sociais</h3>
             <ul className="space-y-4">
               <li>
-                <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors text-sm flex items-center gap-2">
+                <a href="https://www.instagram.com/ditrstudio/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors text-sm flex items-center gap-2">
                   <Instagram className="w-4 h-4" /> Instagram
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors text-sm flex items-center gap-2">
+                <a href="https://www.linkedin.com/in/lucasdittrich/" target="_blank" rel="noopener noreferrer" className="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors text-sm flex items-center gap-2">
                   <Linkedin className="w-4 h-4" /> LinkedIn
                 </a>
               </li>
