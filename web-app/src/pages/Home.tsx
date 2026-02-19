@@ -30,14 +30,18 @@ export function Home() {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 8); // Limit to 8 posts max
 
-  // Find current week info for the date caption
-  const currentWeekInfo = availableWeeks.find(w => w.week_number === selectedWeek);
-  const referenceDate = currentWeekInfo?.fetched_at
-    ? new Date(currentWeekInfo.fetched_at).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    })
+  // Calculate reference date based on selected week number
+  // Formula: Feb 2, 2026 + (selectedWeek - 1) * 7 days
+  const referenceDate = selectedWeek
+    ? (() => {
+      const d = new Date('2026-02-02T00:00:00');
+      d.setDate(d.getDate() + (selectedWeek - 1) * 7);
+      return d.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      });
+    })()
     : '';
 
   // Calculate relative week index (latest = highest number)
@@ -99,7 +103,10 @@ export function Home() {
                 {weekDropdownOpen && availableWeeks.length > 1 && (
                   <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[180px] overflow-hidden">
                     {sortedWeeks.map((week) => {
-                      const weekDate = new Date(week.fetched_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+                      // Calculate date based on week number: Feb 2, 2026 + (week-1)*7 days
+                      const startDate = new Date('2026-02-02T00:00:00');
+                      startDate.setDate(startDate.getDate() + (week.week_number - 1) * 7);
+                      const weekDate = startDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
                       return (
                         <button
                           key={week.week_number}
