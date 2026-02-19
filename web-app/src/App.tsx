@@ -4,15 +4,18 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useData } from './context/DataContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-import { Home } from './pages/Home';
-import { Category } from './pages/Category';
-import { Post } from './pages/Post';
+import { lazy, Suspense } from 'react';
 import { ScrollToTop } from './components/ScrollToTop';
 import { ReadingModeProvider } from './context/ReadingModeContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { AnimatePresence } from 'motion/react';
 import { PageTransition } from './components/PageTransition';
 import { DataProvider } from './context/DataContext';
+
+// Lazy load pages for code splitting
+const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
+const Category = lazy(() => import('./pages/Category').then(m => ({ default: m.Category })));
+const Post = lazy(() => import('./pages/Post').then(m => ({ default: m.Post })));
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -83,7 +86,13 @@ function AppContent() {
       <ScrollToTop />
       <Header />
       <main>
-        <AnimatedRoutes />
+        <Suspense fallback={
+          <div className="min-h-[60vh] flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-black dark:border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        }>
+          <AnimatedRoutes />
+        </Suspense>
       </main>
       <Footer />
       <Analytics />
