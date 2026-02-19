@@ -44,18 +44,7 @@ function AnimatedRoutes() {
 }
 
 function AppContent() {
-  const { error, loading } = useData();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-black dark:text-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-4 border-black dark:border-white border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm font-medium uppercase tracking-widest animate-pulse">Carregando tendências...</p>
-        </div>
-      </div>
-    );
-  }
+  const { error } = useData();
 
   if (error) {
     return (

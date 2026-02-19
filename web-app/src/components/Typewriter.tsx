@@ -27,7 +27,7 @@ export function Typewriter({ text, speed = 30, className = '' }: TypewriterProps
     }, [text, speed]);
 
     return (
-        <span className={className}>
+        <span className={`block min-h-[5em] ${className}`}>
             {displayedText.split('\n').map((line, i, arr) => (
                 <span key={i}>
                     {line}
@@ -35,7 +35,7 @@ export function Typewriter({ text, speed = 30, className = '' }: TypewriterProps
                 </span>
             ))}
             {showCursor && (
-                <span className="inline-block w-[2px] h-[1em] bg-current opacity-50 ml-[2px] align-middle animate-pulse" />
+                <span className="inline-block w-[2px] h-[1em] bg-current opacity-50 ml-[2px] align-middle animate-pulse" aria-hidden="true" />
             )}
         </span>
     );

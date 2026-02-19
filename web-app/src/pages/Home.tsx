@@ -8,7 +8,7 @@ export function Home() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
-  const { posts, availableWeeks, selectedWeek, setSelectedWeek } = useData();
+  const { posts, availableWeeks, selectedWeek, setSelectedWeek, loading } = useData();
 
   // 1. Get Top 1 post from each category
   const categoriesToHighlight = ['UI/UX', 'Figma', 'Design Gráfico', 'Design Industrial'];
@@ -135,39 +135,49 @@ export function Home() {
       <div className="space-y-6 mb-24">
         <h2 className="text-[48px] font-bold tracking-[-0.025em] leading-none text-black dark:text-white">Destaques</h2>
 
-        <div
-          ref={scrollContainerRef}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:snap-none"
-        >
-          {highlights.map((trend, index) => (
-            <div key={trend.id} className="min-w-[85vw] md:min-w-0 snap-center">
-              <TrendCard
-                id={trend.id}
-                title={trend.title}
-                subtitle={trend.subtitle}
-                category={trend.category}
-                image={trend.image}
-
-                numComments={trend.num_comments}
-                score={trend.score}
-                size="large"
-                className="h-[400px] md:h-[500px]"
-                priority={index < 2}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Mobile Pagination Dots */}
-        <div className="flex justify-center gap-2 md:hidden">
-          {highlights.map((_, index) => (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="rounded-[24px] bg-gray-100 dark:bg-gray-900 animate-pulse h-[400px] md:h-[500px]" />
+            ))}
+          </div>
+        ) : (
+          <>
             <div
-              key={index}
-              className={`w-2 h-2 rounded-full transition-colors duration-300 ${index === activeIndex ? 'bg-black dark:bg-white' : 'bg-gray-300 dark:bg-gray-700'
-                }`}
-            />
-          ))}
-        </div>
+              ref={scrollContainerRef}
+              className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:snap-none"
+            >
+              {highlights.map((trend, index) => (
+                <div key={trend.id} className="min-w-[85vw] md:min-w-0 snap-center">
+                  <TrendCard
+                    id={trend.id}
+                    title={trend.title}
+                    subtitle={trend.subtitle}
+                    category={trend.category}
+                    image={trend.image}
+
+                    numComments={trend.num_comments}
+                    score={trend.score}
+                    size="large"
+                    className="h-[400px] md:h-[500px]"
+                    priority={index < 2}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile Pagination Dots */}
+            <div className="flex justify-center gap-2 md:hidden">
+              {highlights.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-colors duration-300 ${index === activeIndex ? 'bg-black dark:bg-white' : 'bg-gray-300 dark:bg-gray-700'
+                    }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Latest Curations Section */}
@@ -176,24 +186,32 @@ export function Home() {
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-black dark:text-white">Últimas curadorias</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
-          {latestCurations.map((item) => (
-            <TrendCard
-              key={item.id}
-              id={item.id}
-              title={item.title}
-              subtitle={item.subtitle}
-              category={item.category}
-              image={item.image}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="rounded-[24px] bg-gray-100 dark:bg-gray-900 animate-pulse h-[320px]" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+            {latestCurations.map((item) => (
+              <TrendCard
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                subtitle={item.subtitle}
+                category={item.category}
+                image={item.image}
 
-              numComments={item.num_comments}
-              score={item.score}
-              size="small"
-              className="h-[320px]"
-              hideArrow
-            />
-          ))}
-        </div>
+                numComments={item.num_comments}
+                score={item.score}
+                size="small"
+                className="h-[320px]"
+                hideArrow
+              />
+            ))}
+          </div>
+        )}
 
       </div>
 

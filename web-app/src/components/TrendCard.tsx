@@ -34,6 +34,24 @@ function extractCommunity(subtitle?: string): string {
   return match ? `r/${match[1]}` : 'Design';
 }
 
+// Optimize Reddit image URLs - request smaller versions
+function optimizeImageUrl(url: string, maxWidth: number = 600): string {
+  if (!url) return url;
+  try {
+    const parsed = new URL(url);
+    // Reddit preview images support width parameter
+    if (parsed.hostname.includes('redd.it') || parsed.hostname.includes('reddit.com')) {
+      parsed.searchParams.set('width', String(maxWidth));
+      parsed.searchParams.set('format', 'pjpg');
+      parsed.searchParams.set('auto', 'webp');
+      return parsed.toString();
+    }
+  } catch {
+    // If URL parsing fails, return original
+  }
+  return url;
+}
+
 interface TrendCardProps {
   id: string;
   title: string;
@@ -66,6 +84,7 @@ export function TrendCard({
 
   const hasImage = image && image.trim() !== '' && !image.startsWith('https://www.reddit.com') && !image.endsWith('.com') && !image.endsWith('.com/');
   const community = extractCommunity(subtitle);
+  const optimizedImage = hasImage ? optimizeImageUrl(image) : image;
 
   return (
     <Link to={`/post/${id}`} className={`group relative block overflow-hidden rounded-[24px] ${className}`}>
@@ -73,7 +92,7 @@ export function TrendCard({
       <div className="absolute inset-0 z-0">
         {hasImage ? (
           <>
-            <ImageWithFallback src={image} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" priority={priority} />
+            <ImageWithFallback src={optimizedImage} alt={title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" priority={priority} />
             <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
           </>
         ) : (
