@@ -203,9 +203,14 @@ function fallbackSummary(title: string, subreddit: string): AISummary {
 // ─── Main Handler ─────────────────────────────────────────────
 
 function getWeekNumber(date: Date): number {
-    const start = new Date(date.getFullYear(), 0, 1);
+    // Custom start date: Feb 2, 2026
+    const start = new Date("2026-02-02T00:00:00");
     const diff = date.getTime() - start.getTime();
-    return Math.ceil((diff / 86400000 + start.getDay() + 1) / 7);
+
+    if (diff < 0) return 1; // Fallback
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    return Math.floor(days / 7) + 1;
 }
 
 Deno.serve(async (req) => {
