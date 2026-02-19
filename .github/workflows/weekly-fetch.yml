@@ -1,0 +1,51 @@
+name: Weekly Design Trends
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC (05:00 BRT)
+    - cron: '0 8 * * 1'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  fetch-and-populate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Python dependencies
+        run: pip install requests python-dotenv
+
+      - name: Install Node.js dependencies
+        working-directory: web-app
+        run: npm install @supabase/supabase-js
+
+      - name: Fetch Reddit posts
+        working-directory: execution
+        run: python check_design_trends.py
+
+      - name: Copy data to web-app
+        run: |
+          cp web-app/public/design_trends.json web-app/public/design_trends.json 2>/dev/null || true
+          echo "✅ Data file ready"
+          cat web-app/public/design_trends.json | python -c "import sys,json; d=json.load(sys.stdin); print(f'Total posts: {sum(len(v) for v in d.values())}')"
+
+      - name: Populate Supabase with AI summaries
+        working-directory: web-app
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node populate_supabase.cjs

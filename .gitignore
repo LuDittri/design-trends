@@ -23,6 +23,6 @@ logs/
 *.log
 
 # Scripts with secrets
-web-app/populate_supabase.cjs
 web-app/test_populate.cjs
+web-app/.env.local
 supabase/.temp/
