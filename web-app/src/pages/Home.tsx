@@ -42,9 +42,6 @@ export function Home() {
 
   // Calculate relative week index (latest = highest number)
   const sortedWeeks = [...availableWeeks].sort((a, b) => a.week_number - b.week_number);
-  const weekDisplayIndex = selectedWeek
-    ? sortedWeeks.findIndex(w => w.week_number === selectedWeek) + 1
-    : 1;
 
   const handleScroll = () => {
     if (scrollContainerRef.current) {
@@ -94,14 +91,14 @@ export function Home() {
                   onClick={(e) => { e.stopPropagation(); setWeekDropdownOpen(!weekDropdownOpen); }}
                   className="flex items-center gap-2 text-[30px] font-normal text-black dark:text-white leading-none hover:opacity-70 transition-opacity cursor-pointer"
                 >
-                  Semana {weekDisplayIndex}
+                  Semana {selectedWeek}
                   <ChevronDown size={20} className={`transition-transform duration-200 ${weekDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Dropdown */}
                 {weekDropdownOpen && availableWeeks.length > 1 && (
                   <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 min-w-[180px] overflow-hidden">
-                    {sortedWeeks.map((week, idx) => {
+                    {sortedWeeks.map((week) => {
                       const weekDate = new Date(week.fetched_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
                       return (
                         <button
@@ -109,7 +106,7 @@ export function Home() {
                           onClick={(e) => { e.stopPropagation(); setSelectedWeek(week.week_number); setWeekDropdownOpen(false); }}
                           className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-between ${selectedWeek === week.week_number ? 'bg-gray-50 dark:bg-gray-800 font-medium' : ''}`}
                         >
-                          <span className="text-black dark:text-white">Semana {idx + 1}</span>
+                          <span className="text-black dark:text-white">Semana {week.week_number}</span>
                           <span className="text-gray-400 dark:text-gray-500 text-xs">{weekDate}</span>
                         </button>
                       );
