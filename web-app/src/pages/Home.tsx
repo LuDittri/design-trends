@@ -136,9 +136,11 @@ export function Home() {
         <h2 className="text-[48px] font-bold tracking-[-0.025em] leading-none text-black dark:text-white">Destaques</h2>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-8 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:snap-none">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="rounded-[24px] bg-gray-100 dark:bg-gray-900 animate-pulse h-[400px] md:h-[500px]" />
+              <div key={i} className="min-w-[85vw] md:min-w-0 snap-center">
+                <div className="rounded-[24px] bg-gray-100 dark:bg-gray-900 animate-pulse h-[400px] md:h-[500px]" />
+              </div>
             ))}
           </div>
         ) : (
