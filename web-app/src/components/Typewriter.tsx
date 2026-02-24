@@ -27,7 +27,7 @@ export function Typewriter({ text, speed = 30, className = '' }: TypewriterProps
     }, [text, speed]);
 
     return (
-        <span className={`block min-h-[5em] ${className}`}>
+        <span className={`block ${className}`}>
             {displayedText.split('\n').map((line, i, arr) => (
                 <span key={i}>
                     {line}

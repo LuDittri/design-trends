@@ -27,7 +27,7 @@ export function Category() {
     <div className="min-h-screen max-w-[1920px] mx-auto bg-white dark:bg-black transition-colors duration-300 px-6 md:px-12 pt-[128px] pb-12">
 
       {/* Hero Section */}
-      <section className="mb-16">
+      <section className="mb-8">
         <div className="flex flex-col md:flex-row justify-between items-end">
           <div>
             <h1 className="text-6xl md:text-[100px] font-bold tracking-[-0.04em] text-black dark:text-white leading-[0.9] break-words max-w-4xl">
@@ -40,7 +40,7 @@ export function Category() {
             </div>
           </div>
         </div>
-        <div className="mt-8 max-w-2xl">
+        <div className="mt-4 max-w-2xl">
           <p className="text-lg md:text-xl text-gray-500 dark:text-gray-400 leading-[1.8] tracking-wide font-light">
             <Typewriter text={`Explorando as últimas tendências e discussões sobre ${categoryLabel.toLowerCase()}.`} />
           </p>
