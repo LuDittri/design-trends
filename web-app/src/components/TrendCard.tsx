@@ -71,7 +71,7 @@ export function TrendCard({
   const isVideo = url && (url.includes('v.redd.it') || url.includes('youtube.com') || url.includes('youtu.be'));
 
   return (
-    <Link to={`/post/${id}`} className={`group relative block overflow-hidden rounded-[24px] ${className}`}>
+    <Link to={`/post/${id}`} className={`group relative block overflow-hidden rounded-3xl ${className}`}>
       {/* Background: Image or Gradient */}
       <div className="absolute inset-0 z-0">
         {hasImage ? (
@@ -84,8 +84,11 @@ export function TrendCard({
             className="w-full h-full transition-transform duration-700 group-hover:scale-105"
             style={{ background: getGradient(id) }}
           >
+            {/* Dark contrast overlay for WCAG compliance */}
+            <div className="absolute inset-0 bg-black/20 z-0" />
+
             {/* Decorative pattern overlay */}
-            <div className="absolute inset-0 opacity-[0.08]" style={{
+            <div className="absolute inset-0 opacity-[0.08] z-0" style={{
               backgroundImage: `radial-gradient(circle at 20% 50%, white 1px, transparent 1px),
                                 radial-gradient(circle at 80% 20%, white 1px, transparent 1px),
                                 radial-gradient(circle at 60% 80%, white 1px, transparent 1px)`,
@@ -94,7 +97,7 @@ export function TrendCard({
             {/* Community name - top center */}
             <div
               className={`absolute top-6 left-0 right-0 w-full z-[1] font-bold tracking-tight select-none text-center ${size === 'large' ? 'text-3xl md:text-4xl' : 'text-xl md:text-2xl'}`}
-              style={{ color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.45), 0 0 12px rgba(0,0,0,0.2)' }}
+              style={{ color: '#fff', textShadow: '0 1px 4px rgba(0,0,0,0.6), 0 0 12px rgba(0,0,0,0.3)' }}
             >
               {community}
             </div>
@@ -104,7 +107,7 @@ export function TrendCard({
 
       {/* Video Overlay Icon */}
       {isVideo && (
-        <div className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none" aria-hidden="true">
           <div className="w-16 h-16 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-xl group-hover:bg-black/70 transition-colors">
             <Play className="w-8 h-8 text-white fill-white ml-1" />
           </div>
@@ -113,7 +116,7 @@ export function TrendCard({
 
       {/* Top Right Arrow */}
       {!hideArrow && (
-        <div className="absolute top-6 right-6 z-10">
+        <div className="absolute top-6 right-6 z-10" aria-hidden="true">
           <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center transform transition-transform duration-300 group-hover:rotate-45 group-hover:scale-110 shadow-sm">
             <ArrowUpRight className="w-4 h-4 text-black" />
           </div>
@@ -122,7 +125,7 @@ export function TrendCard({
 
       {/* Bottom Content / Overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4">
-        <div className="bg-black/40 backdrop-blur-md rounded-[16px] p-4 border border-white/10">
+        <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/10">
 
           {/* Header of card content */}
           <div className="flex items-center justify-between mb-3">
@@ -130,13 +133,16 @@ export function TrendCard({
               {category}
             </div>
 
-            {/* Fake stats mimicking the screenshot */}
-            <div className="flex items-center gap-2 bg-white/20 border border-white/20 rounded-md px-2 py-1">
-              <div className="flex items-center gap-1 text-[10px] text-white/90 font-medium">
+            {/* Stats mimicking screenshot */}
+            <div
+              className="flex items-center gap-2 bg-white/20 border border-white/20 rounded-md px-2 py-1"
+              aria-label={`${numComments || 0} comentários e ${score || 0} upvotes`}
+            >
+              <div className="flex items-center gap-1 text-[10px] text-white/90 font-medium" aria-hidden="true">
                 <MessageSquare className="w-3 h-3" />
                 <span>{numComments != null ? (numComments >= 1000 ? `${(numComments / 1000).toFixed(1)}k` : numComments) : '—'}</span>
               </div>
-              <div className="flex items-center gap-1 text-[10px] text-white/90 font-medium border-l border-white/20 pl-2">
+              <div className="flex items-center gap-1 text-[10px] text-white/90 font-medium border-l border-white/20 pl-2" aria-hidden="true">
                 <UpvoteIcon className="w-3 h-3" />
                 <span>{score != null ? (score >= 1000 ? `${(score / 1000).toFixed(1)}k` : score) : '—'}</span>
               </div>

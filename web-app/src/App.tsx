@@ -72,9 +72,12 @@ function AppContent() {
 
   return (
     <div className="font-sans antialiased text-black bg-white dark:bg-black dark:text-white selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black transition-colors duration-300">
+      <a href="#main-content" className="skip-to-content">
+        Pular para o conteúdo principal
+      </a>
       <ScrollToTop />
       <Header />
-      <main>
+      <main id="main-content" tabIndex={-1} className="outline-none">
         <Suspense fallback={
           <div className="min-h-[60vh] flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-black dark:border-white border-t-transparent rounded-full animate-spin"></div>

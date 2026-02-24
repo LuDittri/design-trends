@@ -61,9 +61,9 @@ export function Header() {
               aria-label="Alternar tema"
             >
               {theme === 'dark' ? (
-                <Sun className="w-5 h-5" />
+                <Sun className="w-5 h-5" aria-hidden="true" />
               ) : (
-                <Moon className="w-5 h-5" />
+                <Moon className="w-5 h-5" aria-hidden="true" />
               )}
             </button>
 
@@ -73,7 +73,7 @@ export function Header() {
               className="md:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-black dark:text-white transition-colors"
               aria-label="Menu"
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -124,19 +124,19 @@ export function Header() {
               return (
                 <>
                   <Link to="/" onClick={close} className={linkClass} style={linkStyle}>
-                    <Home style={iconStyle} /> Início
+                    <Home style={iconStyle} aria-hidden="true" /> Início
                   </Link>
                   <Link to="/category/ui-ux" onClick={close} className={linkClass} style={linkStyle}>
-                    <Layout style={iconStyle} /> UI/UX
+                    <Layout style={iconStyle} aria-hidden="true" /> UI/UX
                   </Link>
                   <Link to="/category/figma" onClick={close} className={linkClass} style={linkStyle}>
-                    <FigmaIcon style={iconStyle} /> Figma
+                    <FigmaIcon style={iconStyle} aria-hidden="true" /> Figma
                   </Link>
                   <Link to="/category/visual" onClick={close} className={linkClass} style={linkStyle}>
-                    <DesignGraphicIcon style={iconStyle} /> Design gráfico
+                    <DesignGraphicIcon style={iconStyle} aria-hidden="true" /> Design gráfico
                   </Link>
                   <Link to="/category/industrial" onClick={close} className={linkClass} style={linkStyle}>
-                    <IndustrialDesignIcon style={iconStyle} /> Design industrial
+                    <IndustrialDesignIcon style={iconStyle} aria-hidden="true" /> Design industrial
                   </Link>
                 </>
               );

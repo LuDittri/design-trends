@@ -83,7 +83,7 @@ export function Post() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="relative aspect-[16/9] mb-12 rounded-[40px] overflow-hidden shadow-sm group"
+              className="relative aspect-[16/9] mb-12 rounded-3xl overflow-hidden shadow-sm group"
             >
               <ParallaxImage src={post.image} alt={post.title} className="w-full h-full" />
             </motion.div>

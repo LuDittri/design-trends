@@ -96,7 +96,7 @@ export function Category() {
       {remainingPosts.length > 0 && (
         <section className="mb-8">
           <h2 className="text-3xl font-bold mb-8 text-black dark:text-white">Demais artigos</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {remainingPosts.map((post, idx) => (
               <TrendCard
                 key={`${post.id}-remaining-${idx}`}
