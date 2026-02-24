@@ -36,6 +36,7 @@ export function ImageWithFallback({ priority, ...props }: ImageWithFallbackProps
       loading={priority ? "eager" : "lazy"}
       decoding={priority ? "sync" : "async"}
       fetchPriority={priority ? "high" : "auto"}
+      referrerPolicy="no-referrer"
     />
   )
 }

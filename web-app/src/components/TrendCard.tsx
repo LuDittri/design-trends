@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { ArrowUpRight, MessageSquare } from 'lucide-react';
+import { ArrowUpRight, MessageSquare, Play } from 'lucide-react';
 import { UpvoteIcon } from './Icons';
 
 // 12 gradient patterns for visual variety
@@ -39,6 +39,7 @@ interface TrendCardProps {
   title: string;
   category: string;
   image: string;
+  url?: string;
 
   subtitle?: string;
   numComments?: number;
@@ -54,6 +55,7 @@ export function TrendCard({
   title,
   category,
   image,
+  url,
 
   subtitle,
   numComments,
@@ -66,6 +68,7 @@ export function TrendCard({
 
   const hasImage = image && image.trim() !== '' && !image.startsWith('https://www.reddit.com') && !image.endsWith('.com') && !image.endsWith('.com/');
   const community = extractCommunity(subtitle);
+  const isVideo = url && (url.includes('v.redd.it') || url.includes('youtube.com') || url.includes('youtu.be'));
 
   return (
     <Link to={`/post/${id}`} className={`group relative block overflow-hidden rounded-[24px] ${className}`}>
@@ -98,6 +101,15 @@ export function TrendCard({
           </div>
         )}
       </div>
+
+      {/* Video Overlay Icon */}
+      {isVideo && (
+        <div className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none">
+          <div className="w-16 h-16 bg-black/50 backdrop-blur-md rounded-full flex items-center justify-center border border-white/20 shadow-xl group-hover:bg-black/70 transition-colors">
+            <Play className="w-8 h-8 text-white fill-white ml-1" />
+          </div>
+        </div>
+      )}
 
       {/* Top Right Arrow */}
       {!hideArrow && (

@@ -157,7 +157,7 @@ export function Home() {
                     subtitle={trend.subtitle}
                     category={trend.category}
                     image={trend.image}
-
+                    url={trend.url}
                     numComments={trend.num_comments}
                     score={trend.score}
                     size="large"
@@ -204,7 +204,7 @@ export function Home() {
                 subtitle={item.subtitle}
                 category={item.category}
                 image={item.image}
-
+                url={item.url}
                 numComments={item.num_comments}
                 score={item.score}
                 size="small"

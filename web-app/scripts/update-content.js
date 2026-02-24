@@ -1,40 +1,43 @@
-// Supabase Edge Function: fetch-reddit
-// Fetches top Reddit posts about design trends and generates AI summaries via Gemini
+import { createClient } from '@supabase/supabase-js';
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY; // Must use service role to bypass RLS policies
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY || !GEMINI_API_KEY) {
+    console.error("❌ Missing environment variables. Please ensure VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and GEMINI_API_KEY are set in your .env.local file.");
+    process.exit(1);
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
 // Category → Subreddit mapping
-const TOPICS: Record<string, string[]> = {
+const TOPICS = {
     "UI/UX": ["UIUX", "UXDesign", "UI_Design"],
     "Figma": ["FigmaDesign"],
-    "Design Gráfico": ["graphic_design", "Design"],
-    "Cultura": ["designthought", "web_design"],
+    "Design Gráfico": ["graphic_design", "Design", "designBR"],
+    "Design Industrial": ["IndustrialDesign", "3Dprinting", "Impressao3D", "3Dmodeling", "blender"]
 };
 
-const REDDIT_USER_AGENT = "script:design_trends_supabase:v2.0 (by /u/anonymous)";
+const REDDIT_USER_AGENT = "script:design_trends_local:v3.0 (by /u/anonymous)";
+
+// ─── Week Number Logic ─────────────────────────────────────────
+
+function getWeekNumber(date) {
+    // Custom start date: Feb 2, 2026
+    const start = new Date("2026-02-02T00:00:00");
+    const diff = date.getTime() - start.getTime();
+
+    if (diff < 0) return 1;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    // Week 1 started Feb 2. Days 0-6 = Week 1. Today Feb 23 is day 21, so 21/7 + 1 = 4 (Semana 4)
+    return Math.floor(days / 7) + 1;
+}
 
 // ─── Reddit Fetching ──────────────────────────────────────────
 
-interface RedditPost {
-    reddit_id: string;
-    title: string;
-    score: number;
-    url: string;
-    subreddit: string;
-    author: string;
-    num_comments: number;
-    created_utc: number;
-    permalink: string;
-    image_url: string | null;
-}
-
-async function fetchSubredditPosts(subredditName: string): Promise<RedditPost[]> {
+async function fetchSubredditPosts(subredditName) {
     const url = `https://www.reddit.com/r/${subredditName}/top.json?t=week&limit=100`;
 
     const response = await fetch(url, {
@@ -55,29 +58,49 @@ async function fetchSubredditPosts(subredditName: string): Promise<RedditPost[]>
     const data = await response.json();
     const children = data?.data?.children ?? [];
 
-    return children.map((child: any) => {
+    return children.map((child) => {
         const p = child.data;
 
-        // Extract best image
-        let imageUrl: string | null = null;
+        let imageUrl = null;
         const preview = p.preview;
 
-        // Handle Reddit Galleries (multiple images)
         if (p.media_metadata) {
             const firstId = Object.keys(p.media_metadata)[0];
             const media = p.media_metadata[firstId];
-            if (media?.s?.u) {
+
+            // media.p contains the optimized resolutions for Reddit gallery images
+            if (media?.p && media.p.length > 0) {
+                // Find a width near 960px-1080px
+                const optimal = media.p.slice().reverse().find(r => r.x <= 1080 && r.x >= 640);
+                if (optimal && optimal.u) imageUrl = optimal.u.replace(/&amp;/g, "&");
+            }
+            if (!imageUrl && media?.s?.u) {
                 imageUrl = media.s.u.replace(/&amp;/g, "&");
             }
         }
 
-        // Handle Standard Images (preview)
-        if (!imageUrl && preview?.images?.[0]?.source?.url) {
-            imageUrl = preview.images[0].source.url.replace(/&amp;/g, "&");
-        } else if (p.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+        if (!imageUrl && preview?.images?.[0]) {
+            const imgDef = preview.images[0];
+
+            // Try to find an optimized "retina" resolution around 960-1080px from Reddit's generated thumbnails
+            const resArray = imgDef.resolutions || [];
+            const optimalRes = resArray.slice().reverse().find(r => r.width <= 1080 && r.width >= 640);
+
+            if (optimalRes && optimalRes.url) {
+                imageUrl = optimalRes.url.replace(/&amp;/g, "&");
+            } else if (imgDef.source?.url) {
+                imageUrl = imgDef.source.url.replace(/&amp;/g, "&");
+            }
+        } else if (!imageUrl && p.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
             imageUrl = p.url;
-        } else if (p.thumbnail?.startsWith("http")) {
+        } else if (!imageUrl && p.thumbnail?.startsWith("http")) {
             imageUrl = p.thumbnail;
+        }
+
+        if (imageUrl && !imageUrl.startsWith('http')) {
+            imageUrl = null;
+        } else if (imageUrl) {
+            imageUrl = imageUrl.replace(/&amp;/g, "&");
         }
 
         return {
@@ -95,9 +118,8 @@ async function fetchSubredditPosts(subredditName: string): Promise<RedditPost[]>
     });
 }
 
-async function fetchPostComments(permalink: string): Promise<string[]> {
+async function fetchPostComments(permalink) {
     try {
-        // Convert permalink to JSON API URL
         const jsonUrl = `${permalink}.json?limit=10&sort=top`;
         const response = await fetch(jsonUrl, {
             headers: { "User-Agent": REDDIT_USER_AGENT },
@@ -106,13 +128,12 @@ async function fetchPostComments(permalink: string): Promise<string[]> {
         if (!response.ok) return [];
 
         const data = await response.json();
-        // Comments are in the second listing
         const comments = data?.[1]?.data?.children ?? [];
 
         return comments
-            .filter((c: any) => c.kind === "t1" && c.data?.body)
+            .filter((c) => c.kind === "t1" && c.data?.body)
             .slice(0, 10)
-            .map((c: any) => c.data.body as string);
+            .map((c) => c.data.body);
     } catch {
         return [];
     }
@@ -120,17 +141,7 @@ async function fetchPostComments(permalink: string): Promise<string[]> {
 
 // ─── Gemini AI Summarization ──────────────────────────────────
 
-interface AISummary {
-    summary: string;
-    why_it_matters: string;
-    tags: string[];
-}
-
-async function generateSummary(
-    title: string,
-    subreddit: string,
-    comments: string[]
-): Promise<AISummary> {
+async function generateSummary(title, subreddit, comments) {
     const commentsText = comments.length > 0
         ? comments.join("\n---\n")
         : "No comments available.";
@@ -176,7 +187,6 @@ Tags should be 3-5 relevant design keywords in English.`;
         const data = await response.json();
         const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
-        // Parse JSON from response (handle possible markdown wrapping)
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) return fallbackSummary(title, subreddit);
 
@@ -192,7 +202,7 @@ Tags should be 3-5 relevant design keywords in English.`;
     }
 }
 
-function fallbackSummary(title: string, subreddit: string): AISummary {
+function fallbackSummary(title, subreddit) {
     return {
         summary: title,
         why_it_matters: `Em alta no r/${subreddit} esta semana.`,
@@ -202,35 +212,13 @@ function fallbackSummary(title: string, subreddit: string): AISummary {
 
 // ─── Main Handler ─────────────────────────────────────────────
 
-function getWeekNumber(date: Date): number {
-    // Custom start date: Feb 2, 2026
-    const start = new Date("2026-02-02T00:00:00");
-    const diff = date.getTime() - start.getTime();
-
-    if (diff < 0) return 1; // Fallback
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    // Adjusted: Week 1 started Feb 2nd. Today is Feb 23 (21 days later).
-    // Original: 21 / 7 + 1 = 4.
-    // Fixed: (21 / 7) = 3 (matches "Semana 3").
-    return Math.floor(days / 7);
-}
-
-Deno.serve(async (req) => {
-    // Optional: verify cron secret for security
-    const authHeader = req.headers.get("Authorization");
-    const cronSecret = Deno.env.get("CRON_SECRET");
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-        // Allow Supabase service calls (they use the service key)
-        const url = new URL(req.url);
-        if (!url.searchParams.get("test")) {
-            // Still allow for testing, but log warning
-            console.warn("No valid auth header. Proceeding anyway for Supabase cron.");
-        }
-    }
+async function main() {
+    console.log("🚀 Starting Local Content Update...");
 
     const now = new Date();
     const weekNumber = getWeekNumber(now);
+
+    console.log(`📅 Current determined week: ${weekNumber}`);
 
     // Create fetch log
     const { data: logEntry } = await supabase
@@ -245,34 +233,28 @@ Deno.serve(async (req) => {
     try {
         for (const [category, subreddits] of Object.entries(TOPICS)) {
             console.log(`\n📂 Processing category: ${category}`);
-            const allPosts: RedditPost[] = [];
+            const allPosts = [];
 
             for (const sub of subreddits) {
                 console.log(`  📡 Fetching r/${sub}...`);
                 const posts = await fetchSubredditPosts(sub);
                 allPosts.push(...posts);
-                // Be nice to Reddit API
                 await new Promise((r) => setTimeout(r, 1500));
             }
 
-            // Sort by score and take top 10
-            allPosts.sort((a: any, b: any) => b.score - a.score);
+            allPosts.sort((a, b) => b.score - a.score);
             const top10 = allPosts.slice(0, 10);
 
-            // Mark first post as featured
             for (let i = 0; i < top10.length; i++) {
                 const post = top10[i];
                 console.log(`  🤖 Summarizing: "${post.title.slice(0, 60)}..."`);
 
-                // Fetch comments for AI context
                 const comments = await fetchPostComments(post.permalink);
                 await new Promise((r) => setTimeout(r, 1000));
 
-                // Generate AI summary
                 const ai = await generateSummary(post.title, post.subreddit, comments);
                 await new Promise((r) => setTimeout(r, 500));
 
-                // Upsert to avoid duplicates
                 const { error } = await supabase
                     .from("posts")
                     .upsert(
@@ -307,7 +289,6 @@ Deno.serve(async (req) => {
             }
         }
 
-        // Update fetch log
         if (logId) {
             await supabase
                 .from("fetch_logs")
@@ -319,14 +300,7 @@ Deno.serve(async (req) => {
                 .eq("id", logId);
         }
 
-        return new Response(
-            JSON.stringify({
-                success: true,
-                posts_fetched: totalFetched,
-                week_number: weekNumber,
-            }),
-            { headers: { "Content-Type": "application/json" } }
-        );
+        console.log(`\n🎉 Success! Fetched and inserted ${totalFetched} posts for Week ${weekNumber}.`);
     } catch (err) {
         console.error(`❌ Critical error: ${err}`);
 
@@ -340,10 +314,7 @@ Deno.serve(async (req) => {
                 })
                 .eq("id", logId);
         }
-
-        return new Response(
-            JSON.stringify({ success: false, error: String(err) }),
-            { status: 500, headers: { "Content-Type": "application/json" } }
-        );
     }
-});
+}
+
+main().catch(console.error);
