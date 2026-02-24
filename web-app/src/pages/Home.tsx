@@ -89,7 +89,7 @@ export function Home() {
           </div>
           <div className="text-right pb-4 flex flex-col items-end md:absolute md:right-0 md:bottom-2">
             <div className="mb-1">
-              <span className="text-[12px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-[0.05em] block text-right mb-1">EDIÇÃO ATUAL</span>
+              <span className="text-[12px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-[0.05em] block text-right mb-1">EDIÇÃO ATUAL</span>
               <div className="relative inline-block">
                 <button
                   onClick={(e) => { e.stopPropagation(); setWeekDropdownOpen(!weekDropdownOpen); }}
@@ -123,7 +123,7 @@ export function Home() {
               </div>
             </div>
             {referenceDate && (
-              <span className="text-[11px] font-normal text-gray-400 dark:text-gray-500 tracking-wide">
+              <span className="text-[11px] font-normal text-gray-500 dark:text-gray-400 tracking-wide">
                 {referenceDate}
               </span>
             )}

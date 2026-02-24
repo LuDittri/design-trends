@@ -30,7 +30,7 @@ export function Header() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-sm transition-all duration-300 border-b border-transparent dark:border-white/10">
         <div className="max-w-7xl mx-auto px-6 md:px-12 h-20 flex items-center justify-between relative">
           {/* Logo */}
-          <Link to="/" className="text-black dark:text-white flex items-center gap-1 hover:opacity-80 transition-opacity">
+          <Link to="/" className="text-black dark:text-white flex items-center gap-1 hover:opacity-80 transition-opacity" aria-label="Página Inicial">
             <Logo className="h-8 w-auto fill-current" />
           </Link>
 
