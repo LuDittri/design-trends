@@ -1,12 +1,25 @@
 
-import { defineConfig } from 'vite';
+import { defineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
+const deferCssPlugin: Plugin = {
+  name: 'defer-css',
+  enforce: 'post',
+  transformIndexHtml(html) {
+    return html.replace(
+      /<link\s+rel="stylesheet"\s+[^>]*href="([^"]+)"[^>]*>/,
+      `<link rel="preload" href="$1" as="style" crossorigin>
+  <link rel="stylesheet" href="$1" media="print" onload="this.media='all'" crossorigin>
+  <noscript><link rel="stylesheet" href="$1" crossorigin></noscript>`
+    );
+  },
+};
+
 export default defineConfig({
   base: './', // Ensure relative paths for assets (critical for GH Pages / subdirectories)
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), deferCssPlugin],
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     alias: {

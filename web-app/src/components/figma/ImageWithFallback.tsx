@@ -7,6 +7,16 @@ interface ImageWithFallbackProps extends React.ImgHTMLAttributes<HTMLImageElemen
   priority?: boolean;
 }
 
+function getOptimizedUrl(url: string | undefined): string {
+  if (!url) return '';
+  // Convert Reddit URLs or others to WebP using wsrv.nl proxy (Cloudflare cached)
+  if (url.startsWith('http') && !url.includes('wsrv.nl')) {
+    // 1080px width is plenty for the large cards, default quality 80, force webp
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=1080&output=webp&q=80`;
+  }
+  return url;
+}
+
 export function ImageWithFallback({ priority, ...props }: ImageWithFallbackProps) {
   const [didError, setDidError] = useState(false)
 
@@ -15,6 +25,7 @@ export function ImageWithFallback({ priority, ...props }: ImageWithFallbackProps
   }
 
   const { src, alt, style, className, ...rest } = props
+  const optimizedSrc = getOptimizedUrl(src);
 
   return didError ? (
     <div
