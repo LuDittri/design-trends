@@ -11,8 +11,8 @@ function getOptimizedUrl(url: string | undefined): string {
   if (!url) return '';
   // Convert Reddit URLs or others to WebP using wsrv.nl proxy (Cloudflare cached)
   if (url.startsWith('http') && !url.includes('wsrv.nl')) {
-    // 1080px width is plenty for the large cards, default quality 80, force webp
-    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=1080&output=webp&q=80`;
+    // 800px width reduces weight for mobile without sacrificing much visual fidelity on large cards, q=75
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=800&output=webp&q=75`;
   }
   return url;
 }
@@ -38,7 +38,7 @@ export function ImageWithFallback({ priority, ...props }: ImageWithFallbackProps
     </div>
   ) : (
     <img
-      src={src}
+      src={optimizedSrc}
       alt={alt}
       className={className}
       style={style}

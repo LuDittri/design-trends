@@ -79,7 +79,7 @@ export function Home() {
       {/* Title Section */}
       <div className="mb-16 md:mb-24">
         <div className="flex flex-col md:flex-row justify-between items-end relative gap-12 md:gap-0">
-          <div className="max-w-[700px]">
+          <div className="max-w-[700px] min-h-[350px] sm:min-h-[300px] md:min-h-0 flex flex-col justify-end md:justify-start">
             <h1 className="text-8xl md:text-[128px] font-bold tracking-[-0.04em] text-black dark:text-white leading-[0.9]">
               Design<br />Trends
             </h1>
