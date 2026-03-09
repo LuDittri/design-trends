@@ -209,7 +209,7 @@ async function main() {
                             week_number: weekNumber,
                             featured: i === 0,
                         },
-                        { onConflict: 'reddit_id' }
+                        { onConflict: 'reddit_id,week_number' }
                     );
 
                 if (error) {
